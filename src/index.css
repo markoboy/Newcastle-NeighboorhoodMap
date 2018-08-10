@@ -68,7 +68,7 @@ body {
 	height: 42px;
 	width: 42px;
 	background-size: 38px;
-	/*background: no-repeat url('./icons/hamburger_icon.svg');*/
+	background: no-repeat url('./icons/hamburger_icon.svg');
 	background-color: inherit;
 	background-position: center;
 	cursor: pointer;

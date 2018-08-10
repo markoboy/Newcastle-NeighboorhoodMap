@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Header from './components/Header';
 
 class App extends Component {
   constructor() {
@@ -38,7 +39,7 @@ class App extends Component {
     const { map } = this.state;
     return (
       <div className="app" id='app'>
-        <header className="header"></header>
+        <Header />
         <div className="wrapper">
           <aside className="sidebar"></aside>
           <section className="map_container" tabIndex="-1">

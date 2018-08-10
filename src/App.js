@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Header from './components/Header';
+import Sidebar from './components/Sidebar';
 
 class App extends Component {
   constructor() {
@@ -41,7 +42,7 @@ class App extends Component {
       <div className="app" id='app'>
         <Header />
         <div className="wrapper">
-          <aside className="sidebar"></aside>
+          <Sidebar />
           <section className="map_container" tabIndex="-1">
             <div id='map' className="map"></div>
             {map ? '' : (<span>Error</span>)}

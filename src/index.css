@@ -1,0 +1,344 @@
+/* @file: index.css */
+
+/* =====================================
+ * General tags styles.
+ * ====================================*/
+html,body,#root {
+	padding: 0;
+	margin: 0;
+	height: 100%;
+}
+
+body {
+	font: 1.3em/2em arial, sans-serif;
+	color: #333;
+	overflow: hidden; /* Hide the overflow so that the elements are on fixed position. Handle the overflow from elements */
+}
+
+/* App styles */
+.app {
+	height: 100%;
+	display: flex;
+	flex-flow: column nowrap;
+}
+
+/* =====================================
+ * Header styles.
+ * ====================================*/
+.header {
+	color: #f3f3f3;
+	background-color: #00837F;
+	width: 100%;
+	height: 2.5em;
+	flex-shrink: 0;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.header_nav {
+	width: 100%;
+	display: flex;
+	flex-flow: row nowrap;
+	align-items: center;
+	justify-content: center;
+}
+
+.header h1 {
+	margin: 0;
+	font-size: 1.6em;
+	letter-spacing: 0.3em;
+	font-variant: small-caps;
+}
+
+.header a {
+	text-decoration: none;
+	color: inherit;
+}
+
+.header a:hover, .header a:focus {
+	text-shadow: 2px 2px 20px orange;
+	transition: text-shadow 0.3s ease-in;
+}
+
+/* Hamburger menu styles */
+.hamburger_icon {
+	display: none;
+	height: 42px;
+	width: 42px;
+	background-size: 38px;
+	/*background: no-repeat url('./icons/hamburger_icon.svg');*/
+	background-color: inherit;
+	background-position: center;
+	cursor: pointer;
+	border: none;
+	border-radius: 12px;
+	font-size: 0;
+	position: absolute;
+	left: 2px;
+}
+
+.hamburger_icon:hover, .hamburger_icon:focus, .hamburger_icon[aria-expanded] {
+	background-color: deepskyblue;
+	transition: background-color 0.2s linear;
+}
+
+/* =====================================
+ * Wrapper styles for the sidebar and the map.
+ * ====================================*/
+.wrapper {
+	width: 100%;
+	display: flex;
+	flex-wrap: nowrap;
+	flex-grow: 1;
+
+	overflow-y: auto;
+	position: relative; /* In order to close the sidebar on small screens */
+}
+
+/* =====================================
+ * Map styles.
+ * ====================================*/
+.map_container {
+	background-color: #000000;
+	flex-grow: 1; /* Get all the width that it is left */
+}
+
+.map {
+	height: 100%;
+	width: 100%;
+}
+
+/* =====================================
+ * InfoWindow styles.
+ * ====================================*/
+.infoWindow {
+	text-align: center;
+	max-width: calc(100vw - 26em);
+	max-height: calc(100vh - 26em);
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+.infoWindow_header {
+	font-weight: 550;
+	letter-spacing: 0.1em;
+	font-variant: small-caps;
+	font-size: 1.5em;
+	color: darkblue;
+	margin: 0.2em 0;
+}
+
+.infoWindow_location {
+	margin-bottom: 0.2em;
+}
+
+.infoWindow_category {
+	margin-bottom: 0.5em;
+	color: orange;
+	font-weight: 400;
+}
+
+.infoWindow_img_container {
+	margin: 0.6em 0.1em;
+}
+
+.infoWindow_img {
+	width: 100%;
+	height: auto;
+}
+
+.infoWindow_link {
+	margin: 0.6em 0;
+	color: blue;
+	font-size: 1.1em;
+	text-decoration: none;
+}
+
+.infoWindow_link:hover, .infoWindow_link:focus {
+	color: darkblue;
+	text-decoration: underline;
+
+	transition: 0.2s ease;
+}
+
+.infoWindow_close_btn {
+	display: block;
+	margin: 0.6em auto;
+	width: 10em;
+	border: 1px solid lightblue;
+	border-radius: 12px;
+	background: linear-gradient(45deg, skyblue, deepskyblue, skyblue);
+	cursor: pointer;
+}
+
+.infoWindow_close_btn:hover, .infoWindow_close_btn:focus {
+	background: linear-gradient(45deg, deepskyblue, skyblue, deepskyblue);
+	transition: background 0.3s ease-in;
+}
+
+
+/* =====================================
+ * Sidebar styles.
+ * ====================================*/
+.sidebar {
+	width: 25%;
+	background-color: #f3f3f3;
+	background-position: center;
+	background-size: cover;
+
+	transition: background-image 0.4s cubic-bezier(0.55, 0.09, 0.68, 0.53); /* Cubic-bezier from developer tools very helpfull */
+
+	overflow-y: auto;
+	overflow-x: hidden;
+	max-height: calc(100vh - 2.5em); /* Max height 100vh - 2.5em of the header hight */
+
+	display: flex;
+	flex-flow: column nowrap;
+}
+
+/* Search field styles */
+.filter-bar {
+	width: 100%;
+	text-align: center;
+	background-color: rgba(255, 255, 255, 0.5);
+	position: relative;
+	padding: 0.2em 0;
+	flex-shrink: 0;
+}
+
+.filter-bar:after {
+	position: absolute;
+	content: '';
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	border-bottom: 2px solid grey;
+}
+
+.filter-bar input[type="search"] {
+	width: 95%;
+	font-size: 0.9em;
+	padding: 0.3em 0.5em;
+	margin: 0.2em 0;
+	border: none;
+	border-bottom: 3px solid rgba(0, 0, 0, 0.3);
+	border-radius: 0.4em;
+}
+
+.clear-query {
+	font-size: 0.7em;
+	color: #000;
+	letter-spacing: 0;
+	line-height: 1;
+	margin: 0.3em 0;
+}
+
+.clear-query .clear-query_button {
+	border: none;
+	border-radius: 2em;
+	display: inline-block;
+	background-color: deepskyblue;
+	width: 95%;
+	margin: 0.4em 0;
+	padding: 0.2em 0;
+	font-size: 1.1em;
+	color: white;
+	cursor: pointer;
+}
+
+.clear-query .clear-query_button:hover, .clear-query .clear-query_button:focus {
+	background-color: white;
+	color: deepskyblue;
+	transition: background-color 0.2s ease-in, color 0.2s ease-out;
+}
+
+/* Locations list styles */
+.locations_list {
+	text-align: center;
+	list-style: none;
+	margin: 0;
+	padding: 0.5em 0;
+	background: linear-gradient(45deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.3));
+
+	flex-grow: 1;
+	line-height: 1;
+}
+
+.locations_list button {
+	width: 100%;
+	font-size: 0.9em;
+	background: linear-gradient(0deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.8));
+	padding: 0.4em 0;
+	border: none;
+}
+
+.locations_list button:hover, .locations_list button:focus {
+	background: linear-gradient(0deg, skyblue, deepskyblue, skyblue);
+	color: white;
+	transition: 0.2s ease-in-out;
+	cursor: pointer;
+}
+
+/* =====================================
+ * Media screen styles.
+ * ====================================*/
+/* Medium screen styles */
+@media screen and (max-width: 780px) {
+	.header h1 {
+		font-size: 1.2em;
+	}
+
+	.sidebar {
+		width: 35%;
+		font-size: 0.9em;
+	}
+}
+
+/* On landscape mode increase infoWindow height */
+@media only screen and (max-width: 780px) and (orientation: landscape) {
+	.infoWindow {
+		max-height: calc(100vh - 12em);
+	}
+}
+
+/* Small screen styles */
+@media screen and (max-width: 571px) {
+	.header h1 {
+		font-size: 1em;
+		line-height: 1;
+		letter-spacing: 0;
+	}
+
+	.header a {
+		margin-left: calc(42px + 0.4em); /* Margin left for the hamburger button */
+	}
+
+	.hamburger_icon {
+		display: block;
+	}
+
+	.sidebar {
+		display: none; /* Set display to none for screen readers */
+		font-size: 0.8em;
+		position: absolute;
+		transform: translate(-9999px, 0);
+		transition: transform 0.3s linear, background-image 0.4s cubic-bezier(0.55, 0.09, 0.68, 0.53);
+	}
+
+	.sidebar.open {
+		transform: translate(0, 0);
+		height: 100%;
+		width: 50%;
+		z-index: 10000;
+	}
+
+	.sidebar.open + .map_container {
+		margin-left: 50%; /* Add margin left to the map container when the sidebar is open */
+	}
+
+	.infoWindow {
+		max-width: calc(100vw - 10em);
+	}
+}

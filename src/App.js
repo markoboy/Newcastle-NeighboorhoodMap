@@ -44,7 +44,7 @@ class App extends Component {
         <div className="wrapper">
           <Sidebar />
           <section className="map_container" tabIndex="-1">
-            <div id='map' className="map"></div>
+            <div id='map' className="map" role="application" aria-label="Google Maps"></div>
             {map ? '' : (<span>Error</span>)}
           </section>
         </div>

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import * as Locations from './utils/Locations';
+import * as gMapsHelper from './utils/GoogleMapsHelper';
 
 class App extends Component {
   constructor() {
@@ -12,6 +13,7 @@ class App extends Component {
       map: null,
       markers: [],
       markerIcons: { default: '', highlighted: '' },
+      infoWindow: '',
       locations: [],
       locationsData: []
     }
@@ -38,7 +40,10 @@ class App extends Component {
       ]
     });
 
-    this.setState({ map });
+    // Create an info window google object to handle locations details.
+    let infoWindow = new window.google.maps.InfoWindow();
+
+    this.setState({ map, infoWindow });
 
     // Get locations and locations data from Forsquare API.
     Locations.getLocations()
@@ -83,12 +88,7 @@ class App extends Component {
       bounds.extend(marker.position);
 
       // Add on click listener.
-      marker.addListener('click', function() {
-        console.log('marker clicked');
-        // Add an animation to the marker.
-        marker.setAnimation(null);
-        marker.setAnimation(google.maps.Animation.Zn);
-      });
+      marker.addListener('click', () => this.handleMarkerOnClick(marker));
 
       // Add on mouseover and mouseout listeners to change markers icons.
       marker.addListener('mouseover', () => this.updateMarkerIcon(marker, highlightedIcon));
@@ -97,6 +97,8 @@ class App extends Component {
 
     // Fit the markers bounds to the map.
     map.fitBounds(bounds);
+
+    this.state.infoWindow.addListener('closeclick', () => gMapsHelper.handleInfoWindowClosing(this.state.infoWindow, map, markers));
 
     this.setState({ markers });
   };
@@ -113,6 +115,27 @@ class App extends Component {
   };
 
   updateMarkerIcon = (marker, markerIcon) => marker.setIcon(markerIcon);
+
+  handleMarkerOnClick = (marker) => {
+    const { map, infoWindow, locationsData } = this.state;
+    // Check to make sure InfoWindow is not opened with this marker.
+    if ( infoWindow.marker !== marker ) {
+      // Add an animation to the marker.
+      marker.setAnimation(null);
+      marker.setAnimation(window.google.maps.Animation.BOUNCE);
+      setTimeout(() => marker.setAnimation(null), 1000); // Stop animation after 1second.
+
+      // Center the map and zoom in when infowindow opens.
+      let center = { lat: marker.position.lat() + 0.005, lng: marker.position.lng() };
+      map.setCenter(center);
+      map.setZoom(15);
+
+      infoWindow.marker = marker;
+      let locationInfo = locationsData.filter( location => location.id === marker.id)[0]; // Get the location info based on the marker id.
+      infoWindow.setContent(`<b>${locationInfo.name}</b>`);
+      infoWindow.open(map, marker);
+    }
+  }
 
   render() {
     // Store state variables for easier use.

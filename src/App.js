@@ -11,6 +11,7 @@ class App extends Component {
       maptype: 'roadmap',
       map: null,
       markers: [],
+      markerIcons: { default: '', highlighted: '' },
       locations: [],
       locationsData: []
     }
@@ -56,6 +57,11 @@ class App extends Component {
     let markers = [];
     const bounds = new google.maps.LatLngBounds();
 
+    // Create the marker's highlighted icon and the default icon.
+    const highlightedIcon = this.createMarkerIcon('ee9999');
+    const defaultIcon = this.createMarkerIcon('0091ff');
+    this.setState({ markerIcons: { default: defaultIcon, highlighted: highlightedIcon }});
+
     // Loop through locations to add them to the map.
     locations.forEach( location => {
       let position = {
@@ -68,6 +74,7 @@ class App extends Component {
         map,
         position,
         animation: google.maps.Animation.DROP,
+        icon: defaultIcon,
         id: location.id
       });
 
@@ -82,6 +89,10 @@ class App extends Component {
         marker.setAnimation(null);
         marker.setAnimation(google.maps.Animation.Zn);
       });
+
+      // Add on mouseover and mouseout listeners to change markers icons.
+      marker.addListener('mouseover', () => this.updateMarkerIcon(marker, highlightedIcon));
+      marker.addListener('mouseout', () => this.updateMarkerIcon(marker, defaultIcon));
     });
 
     // Fit the markers bounds to the map.
@@ -89,6 +100,19 @@ class App extends Component {
 
     this.setState({ markers });
   };
+
+  createMarkerIcon = (markerColor) => {
+    return new window.google.maps.MarkerImage(
+      'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|'+ markerColor +
+      '|40|_|%E2%80%A2',
+      new window.google.maps.Size(25, 40),
+      new window.google.maps.Point(0, 0),
+      new window.google.maps.Point(10, 34),
+      new window.google.maps.Size(25, 40)
+    );
+  };
+
+  updateMarkerIcon = (marker, markerIcon) => marker.setIcon(markerIcon);
 
   render() {
     // Store state variables for easier use.

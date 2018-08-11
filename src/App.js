@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
+import * as Locations from './utils/Locations';
 
 class App extends Component {
   constructor() {
@@ -8,7 +9,9 @@ class App extends Component {
     this.state = {
       zoom: 13,
       maptype: 'roadmap',
-      map: null
+      map: null,
+      locations: [],
+      locationsData: []
     }
   }
 
@@ -34,6 +37,13 @@ class App extends Component {
     });
 
     this.setState({ map });
+
+    // Get locations and locations data from Forsquare API.
+    Locations.getLocations()
+      .then(locations => {
+        Locations.getLocationsData(locations)
+          .then(locationsData => this.setState({ locations, locationsData }));
+      });
   }
 
   render() {

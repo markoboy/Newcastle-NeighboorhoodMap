@@ -149,6 +149,7 @@ class App extends Component {
             markers={markers}
             markerIcons={markerIcons}
             updateMarkerIcon={this.updateMarkerIcon}
+            handleButtonClick={this.handleMarkerOnClick}
           />
           <section className="map_container" tabIndex="-1">
             <div id='map' className="map" role="application" aria-label="Google Maps"></div>

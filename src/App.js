@@ -10,6 +10,7 @@ class App extends Component {
       zoom: 13,
       maptype: 'roadmap',
       map: null,
+      markers: [],
       locations: [],
       locationsData: []
     }
@@ -43,17 +44,60 @@ class App extends Component {
       .then(locations => {
         Locations.getLocationsData(locations)
           .then(locationsData => this.setState({ locations, locationsData }));
+
+        // Init the markers once data has been fetched.
+        this.initMarkers(map, locations);
       });
   }
 
+  initMarkers = (map, locations) => {
+    const { google } = window;
+    // Store markers in an array.
+    let markers = [];
+    const bounds = new google.maps.LatLngBounds();
+
+    // Loop through locations to add them to the map.
+    locations.forEach( location => {
+      let position = {
+        lat: location.location.lat,
+        lng: location.location.lng
+      };
+      // Create the marker.
+      let marker = new google.maps.Marker({
+        title: location.name,
+        map,
+        position,
+        animation: google.maps.Animation.DROP,
+        id: location.id
+      });
+
+      // Push marker to the array and extend the bounds.
+      markers.push(marker);
+      bounds.extend(marker.position);
+
+      // Add on click listener.
+      marker.addListener('click', function() {
+        console.log('marker clicked');
+        // Add an animation to the marker.
+        marker.setAnimation(null);
+        marker.setAnimation(google.maps.Animation.Zn);
+      });
+    });
+
+    // Fit the markers bounds to the map.
+    map.fitBounds(bounds);
+
+    this.setState({ markers });
+  };
+
   render() {
     // Store state variables for easier use.
-    const { map } = this.state;
+    const { map, locations } = this.state;
     return (
       <div className="app" id='app'>
         <Header />
         <div className="wrapper">
-          <Sidebar />
+          <Sidebar locations={locations} />
           <section className="map_container" tabIndex="-1">
             <div id='map' className="map" role="application" aria-label="Google Maps"></div>
             {map ? '' : (<span>Error</span>)}

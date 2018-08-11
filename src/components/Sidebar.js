@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import LocationsList from './LocationsList';
 
 class Sidebar extends Component {
 	render() {
@@ -16,11 +17,7 @@ class Sidebar extends Component {
 					</form>
 				</div>
 				<div>
-					<ul className="locations_list">
-						<li>
-							<button>Location</button>
-						</li>
-					</ul>
+					<LocationsList locations={this.props.locations} />
 				</div>
 			</aside>
 		);

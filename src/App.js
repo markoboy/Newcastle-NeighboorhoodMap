@@ -116,12 +116,17 @@ class App extends Component {
 
   render() {
     // Store state variables for easier use.
-    const { map, locations } = this.state;
+    const { map, locations, markers, markerIcons } = this.state;
     return (
       <div className="app" id='app'>
         <Header />
         <div className="wrapper">
-          <Sidebar locations={locations} />
+          <Sidebar
+            locations={locations}
+            markers={markers}
+            markerIcons={markerIcons}
+            updateMarkerIcon={this.updateMarkerIcon}
+          />
           <section className="map_container" tabIndex="-1">
             <div id='map' className="map" role="application" aria-label="Google Maps"></div>
             {map ? '' : (<span>Error</span>)}

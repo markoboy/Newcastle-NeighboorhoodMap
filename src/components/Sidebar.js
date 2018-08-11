@@ -2,7 +2,20 @@ import React, { Component } from 'react';
 import LocationsList from './LocationsList';
 
 class Sidebar extends Component {
+	// Find the marker from the location id and update its color on button hover.
+	updateMarker = (location, markerIcon) => {
+		const { markers, markerIcons, updateMarkerIcon } = this.props;
+		if (markers.length > 0) {
+			let marker = markers.filter( marker => marker.id === location.id )[0];
+			updateMarkerIcon(marker, markerIcons[markerIcon]);
+		} else {
+			console.log('Markers have not been loaded yet.');
+		}
+	}
+
 	render() {
+		const { locations } = this.props;
+
 		return (
 			<aside
 				id="sidebar"
@@ -17,7 +30,10 @@ class Sidebar extends Component {
 					</form>
 				</div>
 				<div>
-					<LocationsList locations={this.props.locations} />
+					<LocationsList
+						locations={locations}
+						updateIcon={this.updateMarker}
+					/>
 				</div>
 			</aside>
 		);

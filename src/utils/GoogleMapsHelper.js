@@ -134,7 +134,6 @@ const infoWindowContent = (app, marker) => {
 				</div>`
 			) : ''}
 			<a tabindex="-1" class="infoWindow_link" href="${canonicalUrl}" target="_blank">Visit Forsquare site</a>
-			<button tabindex="-1" class="infoWindow_close_btn" aria-label="Close dialog">Close</button>
 		</div>
 	`);
 };

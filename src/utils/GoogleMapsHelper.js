@@ -95,7 +95,7 @@ const createMarkerIcon = (markerColor) => {
 export const handleMarkerOnClick = (app, marker) => {
 	if (!app.state.gMapsHandler) return console.log('GoogleMapsHelper.js - handleMarkerOnClick: wrong argument passed. Please pass App component as an argument.');
 
-  const { map, infoWindow, locationsData } = app.state;
+  const { map, infoWindow } = app.state;
   // Check to make sure InfoWindow is not opened with this marker.
   if ( infoWindow.marker !== marker ) {
     app.setState(state => ({
@@ -116,11 +116,36 @@ export const handleMarkerOnClick = (app, marker) => {
     map.setZoom(15);
 
     infoWindow.marker = marker;
-    let locationInfo = locationsData.filter( location => location.id === marker.id)[0]; // Get the location info based on the marker id.
-    infoWindow.setContent(`<b>${locationInfo.name}</b>`);
+    infoWindowContent(app, marker);
     infoWindow.open(map, marker);
     app.setState({ map, infoWindow });
   }
+};
+
+const infoWindowContent = (app, marker) => {
+	if (!app.state.gMapsHandler) return console.log('GoogleMapsHelper.js - infoWindowContent: wrong argument passed. Please pass App component as an argument.');
+
+	const { infoWindow, locationsData } = app.state;
+
+  let locationInfo = locationsData.filter( location => location.id === marker.id)[0]; // Get the location info based on the marker id.
+	const { name, location, bestPhoto, canonicalUrl, categories } = locationInfo;
+
+	infoWindow.setContent(`
+		<div class="infoWindow" role="dialog" aria-label="${name} informations">
+			<h3 tabindex="-1" class="infoWindow_header">${name}</h3>
+			${location.formattedAddress ? (
+				`<div tabindex="-1" class="infoWindow_location" aria-label="Adress: ${location.formattedAddress.join(', ')}">${location.formattedAddress.join(', ')}</div>`
+			) : ''}
+			<div tabindex="-1" class="infoWindow_category" aria-label="Location type: ${categories[0].name}">${categories[0].name}</div>
+			${bestPhoto ? (
+				`<div class="infoWindow_img_container">
+					<img class="infoWindow_img" src="${bestPhoto.prefix}${bestPhoto.width}x${bestPhoto.height}${bestPhoto.suffix}" alt="A picture of ${name}"/>
+				</div>`
+			) : ''}
+			<a tabindex="-1" class="infoWindow_link" href="${canonicalUrl}" target="_blank">Visit Forsquare site</a>
+			<button tabindex="-1" class="infoWindow_close_btn" aria-label="Close dialog">Close</button>
+		</div>
+	`);
 };
 
 export const filterShowingMarkers = (app, query) => {

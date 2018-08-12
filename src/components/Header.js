@@ -9,8 +9,10 @@ class Header extends Component {
 
 	openSidebar = () => {
 		this.props.openSidebar();
-    // Focus the search bar.
-    document.querySelector('.filter-bar input').focus();
+		// Focus the search bar.
+		let searchBar = document.querySelector('.filter-bar input');
+		// Requestanimationframe in order to make sure that the sidebar is opened so that it get focused.
+		requestAnimationFrame(timestamp => searchBar.focus());
 	};
 
 	render() {

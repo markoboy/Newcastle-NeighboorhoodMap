@@ -15,6 +15,9 @@ export const initMap = (app) => {
 	// Create an info window google object to handle locations details.
 	let infoWindow = new window.google.maps.InfoWindow();
 
+	/* domready event runs when infoWindow opens. */
+	infoWindow.addListener('domready', () => handleInfoWindowOpening(app));
+
 	app.setState({ map, infoWindow });
 };
 
@@ -52,7 +55,7 @@ export const initMarkers = (app, locations) => {
     bounds.extend(marker.position);
 
     // Add on click listener.
-    marker.addListener('click', () => app.handleMarkerOnClick(marker));
+    marker.addListener('click', () => app.handleMarkerOnClick(undefined, marker));
 
     // Add on mouseover and mouseout listeners to change markers icons.
     marker.addListener('mouseover', () => app.updateMarkerIcon(marker, highlightedIcon));
@@ -78,7 +81,7 @@ const createMarkerIcon = (markerColor) => {
   );
 };
 
-export const handleMarkerOnClick = (app, marker) => {
+export const handleMarkerOnClick = (app, event, marker) => {
 	if (!app.state.gMapsHandler) return console.log('GoogleMapsHelper.js - handleMarkerOnClick: wrong argument passed. Please pass App component as an argument.');
 
   const { map, infoWindow } = app.state;
@@ -103,6 +106,10 @@ export const handleMarkerOnClick = (app, marker) => {
   infoWindow.marker = marker;
   infoWindowContent(app, marker);
   infoWindow.open(map, marker);
+
+  // Store the button that opened the infoWindow to set focus on close.
+  event ? app.storeButtonClicked(event.target) : app.storeButtonClicked(null);
+
   app.setState({ map, infoWindow });
 };
 
@@ -115,7 +122,7 @@ const infoWindowContent = (app, marker) => {
 	const { name, location, bestPhoto, canonicalUrl, categories } = locationInfo;
 
 	infoWindow.setContent(`
-		<div class="infoWindow" role="dialog" aria-label="${name} informations">
+		<div class="infoWindow">
 			<h3 tabindex="-1" class="infoWindow_header">${name}</h3>
 			${location.formattedAddress ? (
 				`<div tabindex="-1" class="infoWindow_location" aria-label="Adress: ${location.formattedAddress.join(', ')}">${location.formattedAddress.join(', ')}</div>`
@@ -174,7 +181,7 @@ export const filterShowingMarkers = (app, query) => {
 export const handleInfoWindowClosing = (app) => {
 	if (!app.state.gMapsHandler) return console.log('GoogleMapsHelper.js - handleInfoWindowClosing: wrong argument passed. Please pass App component as an argument.');
 
-	const { infoWindow, markers, map } = app.state;
+	const { infoWindow, markers, map, buttonClicked } = app.state;
 	// Close the info window and empty the previous marker.
 	infoWindow.close();
 	infoWindow.marker = null;
@@ -184,5 +191,94 @@ export const handleInfoWindowClosing = (app) => {
 	markers.filter( marker => marker.map !== null ).map( m => bounds.extend(m.position));
 	map.fitBounds(bounds);
 	map.setZoom(14);
-	app.setState({ infoWindow, map });
+
+	// Set focus to the button that opened the infoWindow or to the map if it was opened from a marker.
+	if (buttonClicked) {
+		// Open sidebar in case it is in small screen.
+		app.openSidebar();
+		requestAnimationFrame(timestamp => buttonClicked.focus()); // Focus the button.
+	} else {
+		document.querySelector('#map').focus(); // Focus the map.
+	}
+
+	// Set button to null to prevent any bugs.
+	app.setState({ infoWindow, map, buttonClicked: null });
+};
+
+/* Store the elements of the infoWindow when it opens in order to lock tab focus.*/
+const handleInfoWindowOpening = (app) => {
+	if (!app.state.gMapsHandler) return console.log('GoogleMapsHelper.js - handleInfoWindowOpening: wrong argument passed. Please pass App component as an argument.');
+
+	// Store the infoWindow node, its parent node(container), childNodes that will receive focus and the closeButton
+	let infoWindowNode, parentNode, childNodes, closeButton;
+
+	infoWindowNode = document.querySelector('.infoWindow');
+	childNodes = Array.from(infoWindowNode.childNodes) // Create an array of infoWindow nodes in order to filter them.
+		.filter(node => node.nodeType !== 3) // Filter out text nodes.
+		.filter(node => node.attributes.hasOwnProperty('tabindex')); // Return only childNodes that have a tabindex attribute.
+
+	parentNode = infoWindowNode.closest('div[style*="cursor: default"]');
+	parentNode.setAttribute('role', 'dialog');
+	parentNode.setAttribute('aria-label', 'InfoWindow');
+
+	closeButton = document.querySelector('div[style*="width: 13px; height: 13px;"]');
+	closeButton.setAttribute('tabindex', '-1');
+	closeButton.setAttribute('aria-label', 'Close dialog');
+
+	closeButton.addEventListener('keydown', event => {
+		// If 'Enter' or 'Space' was pressed close the infoWindow.
+		if (event.keyCode === 13 || event.keyCode === 32) {
+			event.stopPropagation();
+			event.preventDefault();
+			handleInfoWindowClosing(app);
+		}
+	});
+
+	childNodes.push(closeButton); // Push closebutton in the childNodes to be in the tab focus lock.
+
+	requestAnimationFrame(timestamp => childNodes[0].focus()); // Focus the first childNode.
+
+	// Set the starting focus index.
+	let index = 0;
+	// Handle index value and return the new index.
+	const handleIndex = (value) => {
+		if (value || value >= 0) index = value;
+		return index;
+	}
+
+	parentNode.addEventListener('keydown', e => handleInfoWindowKeydown(e, app, childNodes, handleIndex));
+};
+
+/* Handle keydown event on infoWindow */
+const handleInfoWindowKeydown = (event, app, childNodes, handleIndex) => {
+	if (!app.state.gMapsHandler) return console.log('GoogleMapsHelper.js - handleInfoWindowKeydown: wrong argument passed. Please pass App component as an argument.');
+
+	// Get the current index.
+	let index = handleIndex();
+
+	if (event.shiftKey || event.keyCode === 9 || event.keyCode === 27) {
+		event.stopPropagation();
+		event.preventDefault();
+	}
+
+	// If shift+tab was pressed.
+	if (event.shiftKey && event.keyCode === 9) {
+		if (index === 0) {
+			index = handleIndex(childNodes.length - 1); // Update and get the index to focus.
+		} else {
+			index = handleIndex(index - 1);
+		}
+
+		requestAnimationFrame(timestamp => childNodes[index].focus());
+	} else if (event.keyCode === 9) { // If tab was pressed.
+		if (index === childNodes.length - 1) {
+			index = handleIndex(0);
+		} else {
+			index = handleIndex(index + 1);
+		}
+
+		requestAnimationFrame(timestamp => childNodes[index].focus());
+	} else if (event.keyCode === 27) { // If escape was pressed.
+		handleInfoWindowClosing(app);
+	}
 };

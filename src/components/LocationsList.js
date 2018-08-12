@@ -6,7 +6,7 @@ const LocationsList = ({ locations, updateIcon, handleClick }) => {
 			{locations.map(location => (
 				<li key={location.id}>
 					<button
-						onClick={() => handleClick(location)}
+						onClick={(e) => handleClick(e, location)}
 						onMouseEnter={() => updateIcon(location, 'highlighted')}
 						onMouseLeave={() => updateIcon(location, 'default')}
 						onFocus={() => updateIcon(location, 'highlighted')}

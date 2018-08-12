@@ -14,6 +14,7 @@ class App extends Component {
       map: null,
       markers: [],
       markerIcons: { default: '', highlighted: '' },
+      buttonClicked: null,
       infoWindow: '',
       query: '',
       sidebarOpened: false,
@@ -53,8 +54,12 @@ class App extends Component {
     }));
   };
 
-  handleMarkerOnClick = (marker) => {
-    gMapsHelper.handleMarkerOnClick(this, marker);
+  handleMarkerOnClick = (event, marker) => {
+    gMapsHelper.handleMarkerOnClick(this, event, marker);
+  };
+
+  storeButtonClicked = (target) => {
+    this.setState({ buttonClicked: target });
   };
 
   updateQuery = (query) => {
@@ -105,8 +110,8 @@ class App extends Component {
             updateQuery={this.updateQuery}
             clearQuery={this.clearQuery}
           />
-          <section className="map_container" tabIndex="-1" onClick={() => this.closeSidebar()}>
-            <div id='map' className="map" role="application" aria-label="Google Maps"></div>
+          <section className="map_container" onClick={() => this.closeSidebar()}>
+            <div id='map' className="map" role="application" aria-label="Google Maps" tabIndex="-1"></div>
             {map ? '' : (<span>Error</span>)}
           </section>
         </div>

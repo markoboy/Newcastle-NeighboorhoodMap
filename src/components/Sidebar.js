@@ -52,10 +52,10 @@ class Sidebar extends Component {
 		return this.props.markers.filter( marker => marker.id === location.id )[0];
 	};
 
-	openInfoWindow = (location) => {
+	openInfoWindow = (event, location) => {
 		if (this.props.markers.length > 0) {
 			let marker = this.getMarker(location);
-			this.props.handleButtonClick(marker);
+			this.props.handleButtonClick(event, marker);
 			this.props.closeSidebar();
 		} else {
 			console.log('Markers have not been loaded yet.');
@@ -77,7 +77,7 @@ class Sidebar extends Component {
 			<aside
 				id="sidebar"
 				className={isOpened ? "sidebar open" : "sidebar"}
-				style={{display: 'inherit'}}
+				style={isOpened ? {display: 'inherit'} : {display: ''}}
 				aria-labelledby="menubutton"
 				onKeyDown={(e) => this.handleEscapeKey(e)}>
 				<div className="filter-bar">

@@ -15,6 +15,15 @@ class Sidebar extends Component {
 		}
 	};
 
+	handleEscapeKey = event => {
+		// If escape key is pressed close the sidebar and set focus to the menubutton.
+		if (event.key === 'Escape') {
+			event.stopPropagation();
+			this.props.closeSidebar();
+			document.querySelector('#menubutton').focus();
+		}
+	};
+
 	/* Handle the submit of the query */
 	handleSubmit = e => {
 		e.preventDefault();
@@ -69,7 +78,8 @@ class Sidebar extends Component {
 				id="sidebar"
 				className={isOpened ? "sidebar open" : "sidebar"}
 				style={{display: 'inherit'}}
-				aria-labelledby="menubutton">
+				aria-labelledby="menubutton"
+				onKeyDown={(e) => this.handleEscapeKey(e)}>
 				<div className="filter-bar">
 					<form onSubmit={(e) => this.handleSubmit(e)}>
 						<input

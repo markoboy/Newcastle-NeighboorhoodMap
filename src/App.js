@@ -16,6 +16,7 @@ class App extends Component {
       markerIcons: { default: '', highlighted: '' },
       infoWindow: '',
       query: '',
+      sidebarOpened: false,
       locations: [],
       locationsData: []
     }
@@ -69,12 +70,28 @@ class App extends Component {
     document.querySelector('.filter-bar input').focus();
   };
 
+  openSidebar = () => {
+    // Check if the small screen is displayed and that the sidebar is closed.
+    if (window.innerWidth <= 570 && !this.state.sidebarOpened)
+      this.setState({ sidebarOpened: true });
+  };
+
+  closeSidebar = () => {
+    // Check if the small screen is displayed and that the sidebar is opened.
+    if (window.innerWidth <= 570 && this.state.sidebarOpened)
+      this.setState({ sidebarOpened: false });
+  };
+
   render() {
     // Store state variables for easier use.
-    const { map, locations, markers, markerIcons, query } = this.state;
+    const { map, locations, markers, markerIcons, query, sidebarOpened } = this.state;
     return (
       <div className="app" id='app'>
-        <Header />
+        <Header
+          sidebarOpened={sidebarOpened}
+          openSidebar={this.openSidebar}
+          closeSidebar={this.closeSidebar}
+        />
         <div className="wrapper">
           <Sidebar
             locations={locations}
@@ -82,11 +99,13 @@ class App extends Component {
             markerIcons={markerIcons}
             updateMarkerIcon={this.updateMarkerIcon}
             handleButtonClick={this.handleMarkerOnClick}
+            isOpened={sidebarOpened}
+            closeSidebar={this.closeSidebar}
             query={query}
             updateQuery={this.updateQuery}
             clearQuery={this.clearQuery}
           />
-          <section className="map_container" tabIndex="-1">
+          <section className="map_container" tabIndex="-1" onClick={() => this.closeSidebar()}>
             <div id='map' className="map" role="application" aria-label="Google Maps"></div>
             {map ? '' : (<span>Error</span>)}
           </section>

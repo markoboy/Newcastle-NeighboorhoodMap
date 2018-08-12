@@ -47,13 +47,14 @@ class Sidebar extends Component {
 		if (this.props.markers.length > 0) {
 			let marker = this.getMarker(location);
 			this.props.handleButtonClick(marker);
+			this.props.closeSidebar();
 		} else {
 			console.log('Markers have not been loaded yet.');
 		}
 	};
 
 	render() {
-		const { locations, markers, query, updateQuery, clearQuery } = this.props;
+		const { locations, markers, isOpened, query, updateQuery, clearQuery } = this.props;
 
 		// Show markers locations if they have loaded else show locations data. For offline use.
 		let showingLocations;
@@ -66,7 +67,8 @@ class Sidebar extends Component {
 		return (
 			<aside
 				id="sidebar"
-				className="sidebar"
+				className={isOpened ? "sidebar open" : "sidebar"}
+				style={{display: 'inherit'}}
 				aria-labelledby="menubutton">
 				<div className="filter-bar">
 					<form onSubmit={(e) => this.handleSubmit(e)}>

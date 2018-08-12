@@ -266,6 +266,10 @@ body {
 	line-height: 1;
 }
 
+.locations_list li:nth-child(odd) {
+	background-color: rgba(0, 0, 0, 0.15);
+}
+
 .locations_list button {
 	width: 100%;
 	font-size: 0.9em;

@@ -11,7 +11,7 @@ const LocationsList = ({ locations, updateIcon, handleClick }) => {
 						onMouseLeave={() => updateIcon(location, 'default')}
 						onFocus={() => updateIcon(location, 'highlighted')}
 						onBlur={() => updateIcon(location, 'default')}
-					>{location.name}</button>
+					>{location.title ? (location.title) : (location.name)}</button>
 				</li>
 			))}
 		</ul>

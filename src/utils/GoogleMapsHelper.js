@@ -123,6 +123,45 @@ export const handleMarkerOnClick = (app, marker) => {
   }
 };
 
+export const filterShowingMarkers = (app, query) => {
+	if (!app.state.gMapsHandler) return console.log('GoogleMapsHelper.js - filterShowingMarkers: wrong argument passed. Please pass App component as an argument.');
+
+	const { map, markers, infoWindow } = app.state;
+	// Check if there is a query.
+	if (query) {
+		// Check if the current opened marker infoWindow is not included in the query and close it.
+		markers.filter(marker => !marker.title.toLowerCase().includes( query.toLowerCase() ))
+			.filter(m => infoWindow.marker === m).map(mr => handleInfoWindowClosing(app));
+
+		app.setState(state => ({
+			markers: state.markers.map(m => {
+				// If markers title match the query and they are not displayed on the map, display them.
+				if ( m.title.toLowerCase().includes( query.toLowerCase() ) ) {
+					if (m.map === null) {
+						m.setAnimation(null);
+						m.setAnimation(window.google.maps.Animation.DROP); // Add some animation to make markers more visible.
+						m.setMap(map);
+					}
+				} else {
+					m.setMap(null);
+				}
+				return m;
+			})
+		}));
+	} else {
+		app.setState(state => ({
+			markers: state.markers.map(m => {
+				if (m.map === null) {
+					m.setAnimation(null);
+					m.setAnimation(window.google.maps.Animation.DROP); // Add some animation to make markers more visible.
+					m.setMap(map);
+				}
+				return m;
+			})
+		}));
+	}
+};
+
 export const handleInfoWindowClosing = (app) => {
 	if (!app.state.gMapsHandler) return console.log('GoogleMapsHelper.js - handleInfoWindowClosing: wrong argument passed. Please pass App component as an argument.');
 

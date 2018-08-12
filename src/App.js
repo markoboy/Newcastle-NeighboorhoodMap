@@ -15,6 +15,7 @@ class App extends Component {
       markers: [],
       markerIcons: { default: '', highlighted: '' },
       infoWindow: '',
+      query: '',
       locations: [],
       locationsData: []
     }
@@ -37,6 +38,11 @@ class App extends Component {
       });
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.query !== this.state.query)
+      gMapsHelper.filterShowingMarkers(this, this.state.query);
+  }
+
   updateMarkerIcon = (marker, markerIcon) => {
     this.setState(state => ({
       markers: state.markers.map(m => {
@@ -44,15 +50,28 @@ class App extends Component {
         return m;
       })
     }));
-  }
+  };
 
   handleMarkerOnClick = (marker) => {
     gMapsHelper.handleMarkerOnClick(this, marker);
-  }
+  };
+
+  updateQuery = (query) => {
+    this.setState({ query: query.replace(/\s\s+/g, ' ') },
+        gMapsHelper.filterShowingMarkers(this, query.replace(/\s\s+/g, ' ')
+      ));
+  };
+
+  clearQuery = () => {
+    this.setState({ query: '' });
+
+    // Focus the search bar.
+    document.querySelector('.filter-bar input').focus();
+  };
 
   render() {
     // Store state variables for easier use.
-    const { map, locations, markers, markerIcons } = this.state;
+    const { map, locations, markers, markerIcons, query } = this.state;
     return (
       <div className="app" id='app'>
         <Header />
@@ -63,6 +82,9 @@ class App extends Component {
             markerIcons={markerIcons}
             updateMarkerIcon={this.updateMarkerIcon}
             handleButtonClick={this.handleMarkerOnClick}
+            query={query}
+            updateQuery={this.updateQuery}
+            clearQuery={this.clearQuery}
           />
           <section className="map_container" tabIndex="-1">
             <div id='map' className="map" role="application" aria-label="Google Maps"></div>

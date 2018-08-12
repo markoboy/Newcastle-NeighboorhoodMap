@@ -2,24 +2,6 @@ import React, { Component } from 'react';
 import LocationsList from './LocationsList';
 
 class Sidebar extends Component {
-	constructor() {
-		super();
-		this.state = {
-			query: ''
-		};
-	}
-
-	updateQuery = (query) => {
-		this.setState({ query: query.replace(/\s\s+/g, ' ') });
-	};
-
-	clearQuery = () => {
-		this.setState({ query: '' });
-
-		// Focus the search bar.
-		document.querySelector('.filter-bar input').focus();
-	};
-
 	/* Handle the keypress on the clear-query button */
 	handleKeyDown = e => {
 		let allowedKeys = {
@@ -29,7 +11,7 @@ class Sidebar extends Component {
 		// If a key from the allowed keys is pressed clear query.
 		if (allowedKeys[e.keyCode]) {
 			e.preventDefault();
-			this.clearQuery();
+			this.props.clearQuery();
 		}
 	};
 
@@ -71,12 +53,12 @@ class Sidebar extends Component {
 	};
 
 	render() {
-		const { locations } = this.props;
-		const { query } = this.state;
+		const { locations, markers, query, updateQuery, clearQuery } = this.props;
 
+		// Show markers locations if they have loaded else show locations data. For offline use.
 		let showingLocations;
-		if (query) {
-			showingLocations = locations.filter( location => location.name.toLowerCase().includes(query.toLowerCase()) );
+		if (markers.length > 0) {
+			showingLocations = markers.filter(marker => marker.map !== null);
 		} else {
 			showingLocations = locations;
 		}
@@ -92,7 +74,7 @@ class Sidebar extends Component {
 							type="search"
 							placeholder="Search locations"
 							value={query}
-							onChange={(event) => this.updateQuery(event.target.value)}
+							onChange={(event) => updateQuery(event.target.value)}
 						/>
 						{query ? (
 							<div className="clear-query">
@@ -104,7 +86,7 @@ class Sidebar extends Component {
 									className="clear-query_button"
 									tabIndex="0"
 									role="button"
-									onClick={() => this.clearQuery()}
+									onClick={() => clearQuery()}
 									onKeyDown={(e) => this.handleKeyDown(e)}
 								>Clear query</div>
 							</div>

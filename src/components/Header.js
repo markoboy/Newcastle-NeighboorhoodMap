@@ -7,8 +7,14 @@ class Header extends Component {
 			this.props.closeSidebar();
 	};
 
+	openSidebar = () => {
+		this.props.openSidebar();
+    // Focus the search bar.
+    document.querySelector('.filter-bar input').focus();
+	};
+
 	render() {
-		const { sidebarOpened, openSidebar, closeSidebar } = this.props;
+		const { sidebarOpened, closeSidebar } = this.props;
 		return (
 			<header className="header" onClick={(e) => this.onHeaderClick(e)}>
 				<nav className="header_nav">
@@ -18,7 +24,7 @@ class Header extends Component {
 						aria-haspopup="true"
 						aria-controls="sidebar"
 						aria-expanded={sidebarOpened}
-						onClick={() => sidebarOpened ? closeSidebar() : openSidebar()}
+						onClick={() => sidebarOpened ? closeSidebar() : this.openSidebar()}
 					>Filter locations</button>
 					<a href="/"><h1>Newcastle upon Tyne</h1></a>
 				</nav>

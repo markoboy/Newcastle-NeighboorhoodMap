@@ -9,21 +9,7 @@ export const initMap = (app) => {
 	let map = new window.google.maps.Map(document.getElementById('map'), {
 	  zoom: app.state.zoom,
 	  maptype: app.state.maptype,
-	  center: { lat: 54.978252, lng: -1.617780 },
-	  // Hide the default google maps icons to prevent info window bug by opening
-	  // an info window from the default locations. https://stackoverflow.com/questions/23390149/gmaps-api-remove-default-poi
-	  styles: [
-	    {
-	      featureType: 'poi',
-	      elementType: 'labels',
-	      stylers: [{ visibility: 'off' }]
-	    },
-	    {
-	      featureType: 'transit',
-	      elementType: 'labels',
-	      stylers: [{ visibility: 'off'}]
-	    }
-	  ]
+	  center: { lat: 54.978252, lng: -1.617780 }
 	});
 
 	// Create an info window google object to handle locations details.
@@ -96,30 +82,28 @@ export const handleMarkerOnClick = (app, marker) => {
 	if (!app.state.gMapsHandler) return console.log('GoogleMapsHelper.js - handleMarkerOnClick: wrong argument passed. Please pass App component as an argument.');
 
   const { map, infoWindow } = app.state;
-  // Check to make sure InfoWindow is not opened with this marker.
-  if ( infoWindow.marker !== marker ) {
-    app.setState(state => ({
-      markers: state.markers.map(m => {
-        if (m === marker) {
-          // Add an animation to the marker.
-          m.setAnimation(null);
-          m.setAnimation(window.google.maps.Animation.BOUNCE);
-          setTimeout(() => m.setAnimation(null), 1000); // Stop animation after 1second.
-        }
-        return m;
-      })
-    }));
+  // Set state with the new marker.
+  app.setState(state => ({
+    markers: state.markers.map(m => {
+      if (m === marker) {
+        // Add an animation to the marker.
+        m.setAnimation(null);
+        m.setAnimation(window.google.maps.Animation.BOUNCE);
+        setTimeout(() => m.setAnimation(null), 1000); // Stop animation after 1second.
+      }
+      return m;
+    })
+  }));
 
-    // Center the map and zoom in when infowindow opens.
-    let center = { lat: marker.position.lat() + 0.005, lng: marker.position.lng() };
-    map.setCenter(center);
-    map.setZoom(15);
+  // Center the map and zoom in when infowindow opens.
+  let center = { lat: marker.position.lat() + 0.005, lng: marker.position.lng() };
+  map.setCenter(center);
+  map.setZoom(15);
 
-    infoWindow.marker = marker;
-    infoWindowContent(app, marker);
-    infoWindow.open(map, marker);
-    app.setState({ map, infoWindow });
-  }
+  infoWindow.marker = marker;
+  infoWindowContent(app, marker);
+  infoWindow.open(map, marker);
+  app.setState({ map, infoWindow });
 };
 
 const infoWindowContent = (app, marker) => {

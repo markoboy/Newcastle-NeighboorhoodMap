@@ -20,6 +20,7 @@ body {
 	height: 100%;
 	display: flex;
 	flex-flow: column nowrap;
+	position: relative; /* To add error pop up window. */
 }
 
 /* =====================================
@@ -101,13 +102,24 @@ body {
  * Map styles.
  * ====================================*/
 .map_container {
-	background-color: #000000;
+	background-color: rgba(153, 153, 102, 0.5);
 	flex-grow: 1; /* Get all the width that it is left */
+	position: relative;
 }
 
 .map {
 	height: 100%;
 	width: 100%;
+}
+
+.map_container span {
+	position: absolute;
+	display: block;
+	width: 90%;
+	text-align: center;
+	font-size: 0.9em;
+	top: 40%;
+	left: 5%;
 }
 
 /* =====================================
@@ -283,6 +295,32 @@ body {
 	color: white;
 	transition: 0.2s ease-in-out;
 	cursor: pointer;
+}
+
+/* =====================================
+ * Error dialog styles.
+ * ====================================*/
+.error_dialog {
+	width: 85%;
+	z-index: 100000;
+	position: absolute;
+	bottom: 0;
+	left: 7.5%;
+	text-align: center;
+	font-size: 0.85em;
+	line-height: 1.8;
+	color: #f3f3f3;
+	background-color: rgba(0, 0, 0, 0);
+	background: linear-gradient(90deg, rgba(153, 102, 0, 0.5), rgba(153, 102, 0, 0.75), rgba(153, 102, 0, 0.5));
+	text-shadow: 3px 5px 10px rgba(0, 0, 0, 0.5);
+	border-radius: 10px;
+	display: none;
+	opacity: 0;
+}
+
+.error_dialog.open {
+	opacity: 1;
+	transition: opacity 0.25s cubic-bezier(0.46, 0.03, 0.52, 0.96);
 }
 
 /* =====================================

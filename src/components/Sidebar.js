@@ -58,7 +58,7 @@ class Sidebar extends Component {
 			this.props.handleButtonClick(event, marker);
 			this.props.closeSidebar();
 		} else {
-			console.log('Markers have not been loaded yet.');
+			this.props.handleError(event.target.innerHTML + ', list button - ', 'Location information is not available without Google Maps.')
 		}
 	};
 

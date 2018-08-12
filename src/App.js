@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
+import ErrorDialog from './components/ErrorDialog';
 import * as Locations from './utils/Locations';
 import * as gMapsHelper from './utils/GoogleMapsHelper';
 
@@ -19,14 +20,26 @@ class App extends Component {
       query: '',
       sidebarOpened: false,
       locations: [],
-      locationsData: []
+      locationsData: [],
+      error: []
     }
   }
 
   componentDidMount() {
-    // Initialize the Google Maps.
-    if (window.google)
-      gMapsHelper.initMap(this);
+    // Initialize the Google Maps, try requesting this for 3s in case that there is a slow connection.
+    let times = 0;
+    (function testGoogle(app) {
+      if (window.google) {
+        gMapsHelper.initMap(app);
+      } else if (times < 10) {
+        setTimeout(() => {
+          testGoogle(app);
+          times++;
+        }, 300);
+      } else {
+        app.handleError('gMapsHelper.initMap', 'Google maps failed to load. Please check your connection.')
+      }
+    })(this);
 
     // Get locations and locations data from Forsquare API.
     Locations.getLocations()
@@ -35,8 +48,19 @@ class App extends Component {
           .then(locationsData => this.setState({ locations, locationsData }));
 
         // Init the markers once data has been fetched.
-        if (window.google)
-          gMapsHelper.initMarkers(this, locations);
+        let times = 0;
+        (function testGoogle(app) {
+          if (window.google){
+            gMapsHelper.initMarkers(app, locations);
+          } else if (times < 10) {
+            setTimeout(() => {
+              testGoogle(app);
+              times++;
+            }, 300);
+          } else {
+            app.handleError('gMapsHelper.initMarkers', 'Google maps failed to load. Please check your connection.')
+          }
+        })(this);
       });
   }
 
@@ -87,9 +111,24 @@ class App extends Component {
       this.setState({ sidebarOpened: false });
   };
 
+  // This function will handle errors. It will alert the user with an error alert
+  // and it will show more info about the error on the console.
+  handleError = (error, msg) => {
+    console.log(error, msg);
+    this.setState(state => ({
+      error: state.error.concat(msg)
+    }));
+  };
+
+  clearError = () => {
+    this.setState(state => ({
+      error: state.error.slice(1)
+    }));
+  };
+
   render() {
     // Store state variables for easier use.
-    const { map, locations, markers, markerIcons, query, sidebarOpened } = this.state;
+    const { map, locations, markers, markerIcons, query, sidebarOpened, error } = this.state;
     return (
       <div className="app" id='app'>
         <Header
@@ -109,14 +148,16 @@ class App extends Component {
             query={query}
             updateQuery={this.updateQuery}
             clearQuery={this.clearQuery}
+            handleError={this.handleError}
           />
           <section className="map_container" onClick={() => this.closeSidebar()}>
             <div id='map' className="map" role="application" aria-label="Google Maps" tabIndex="-1"></div>
-            {map ? '' : (<span>Error</span>)}
+            {map ? '' : (<span>Google Maps failed to load. Please check your connection.</span>)}
           </section>
         </div>
+        <ErrorDialog errorMsg={error[0]} clearError={this.clearError} />
       </div>
-    ); 
+    );
   }
 }
 

@@ -109,7 +109,7 @@ class Sidebar extends Component {
 						)}
 					</form>
 				</div>
-				<div>
+				<div role="region" aria-label="Search results">
 					<LocationsList
 						locations={showingLocations}
 						updateIcon={this.updateMarker}

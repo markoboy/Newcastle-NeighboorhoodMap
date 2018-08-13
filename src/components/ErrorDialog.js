@@ -32,6 +32,8 @@ class ErrorDialog extends Component {
 			<div
 				className={errorMsg ? 'error_dialog open' : 'error_dialog'}
 				role="alert"
+				aria-live="assertive"
+				aria-atomic="true"
 				style={errorMsg ? {display: 'block'} : {display: ''}}
 				>
 				<span>{errorMsg}</span>

@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import ErrorDialog from './components/ErrorDialog';
-import * as Locations from './utils/Locations';
 import * as gMapsHelper from './utils/GoogleMapsHelper';
 
 class App extends Component {
@@ -26,42 +25,8 @@ class App extends Component {
   }
 
   componentDidMount() {
-    // Initialize the Google Maps, try requesting this for 3s in case that there is a slow connection.
-    let times = 0;
-    (function testGoogle(app) {
-      if (window.google) {
-        gMapsHelper.initMap(app);
-      } else if (times < 10) {
-        setTimeout(() => {
-          testGoogle(app);
-          times++;
-        }, 300);
-      } else {
-        app.handleError('gMapsHelper.initMap', 'Google maps failed to load. Please check your connection.')
-      }
-    })(this);
-
-    // Get locations and locations data from Forsquare API.
-    Locations.getLocations()
-      .then(locations => {
-        Locations.getLocationsData(locations)
-          .then(locationsData => this.setState({ locations, locationsData }));
-
-        // Init the markers once data has been fetched.
-        let times = 0;
-        (function testGoogle(app) {
-          if (window.google){
-            gMapsHelper.initMarkers(app, locations);
-          } else if (times < 10) {
-            setTimeout(() => {
-              testGoogle(app);
-              times++;
-            }, 300);
-          } else {
-            app.handleError('gMapsHelper.initMarkers', 'Google maps failed to load. Please check your connection.')
-          }
-        })(this);
-      });
+    // Load the google maps.
+    gMapsHelper.loadGoogleMaps(this);
   }
 
   componentDidUpdate(prevProps, prevState) {

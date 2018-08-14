@@ -70,7 +70,8 @@ class Sidebar extends Component {
 		if (markers.length > 0) {
 			showingLocations = markers.filter(marker => marker.map !== null);
 		} else {
-			showingLocations = locations;
+			showingLocations = locations.filter(location => location.location); // Filter out any location that had problem fetching.
+			if ( query ) showingLocations = showingLocations.filter(loc => loc.name.toLowerCase().includes( query.toLowerCase() )); // Show locations based on query.
 		}
 
 		return (

@@ -3,6 +3,26 @@
  * This is a helper file to organize the google maps
  * functions to add to the markers and the infowindow.
  */
+import * as Locations from './Locations';
+
+/* From: https://www.simoahava.com/gtm-tips/add-load-listener-script-elements/ */
+export const loadGoogleMaps = (app) => {
+	let el = document.createElement('script');
+	el.src = 'https://maps.googleapis.com/maps/api/js?v=3'; //key=AIzaSyAnxs1wPyU-Aq5dvX-i98Noi2twhFDJOrE&
+	el.async = true;
+
+	el.addEventListener('load', function() {
+		initMap(app);
+		initMarkers(app);
+	});
+
+	el.addEventListener('error', function(e) {
+		app.handleError(e.target.src, 'Google maps failed to load. Please check your connection.');
+	});
+
+	document.head.appendChild(el);
+};
+
 export const initMap = (app) => {
 	if (!app.state.gMapsHandler) return console.log('GoogleMapsHelper.js - initMap: wrong argument passed. Please pass App component as an argument.');
 
@@ -21,11 +41,19 @@ export const initMap = (app) => {
 	app.setState({ map, infoWindow });
 };
 
-export const initMarkers = (app, locations) => {
+// Async function from: https://www.twilio.com/blog/2015/10/asyncawait-the-hero-javascript-deserved.html
+export const initMarkers = async (app) => {
 	if (!app.state.gMapsHandler) return console.log('GoogleMapsHelper.js - initMarkers: wrong argument passed. Please pass App component as an argument.');
 
   const { google } = window;
   const { map, infoWindow } = app.state;
+
+  // Get the locations and the locationsData. Await for promise to end before proceeding with the function.
+	let locations = await Locations.getLocations();
+	let locationsData = await Locations.getLocationsData(locations);
+	// Alert the user if there was data that wasnt fetched.
+	locationsData.filter(loc => loc.errorType).map(error => app.handleError(error.errorType, error.errorDetail));
+
   // Store markers in an array.
   let markers = [];
   const bounds = new google.maps.LatLngBounds();
@@ -36,6 +64,9 @@ export const initMarkers = (app, locations) => {
 
   // Loop through locations to add them to the map.
   locations.forEach( location => {
+    // If there was an error while fetching the locations, dont access this location and alert the user.
+    if (location.errorType) return app.handleError(location.errorType, location.errorDetail);
+
     let position = {
       lat: location.location.lat,
       lng: location.location.lng
@@ -67,7 +98,13 @@ export const initMarkers = (app, locations) => {
 
   infoWindow.addListener('closeclick', () => handleInfoWindowClosing(app));
 
-  app.setState({ map, markers, markerIcons: { default: defaultIcon, highlighted: highlightedIcon }});
+  app.setState({
+		map,
+		markers,
+		markerIcons: { default: defaultIcon, highlighted: highlightedIcon },
+		locations,
+		locationsData
+  });
 };
 
 const createMarkerIcon = (markerColor) => {
@@ -84,7 +121,7 @@ const createMarkerIcon = (markerColor) => {
 export const handleMarkerOnClick = (app, event, marker) => {
 	if (!app.state.gMapsHandler) return console.log('GoogleMapsHelper.js - handleMarkerOnClick: wrong argument passed. Please pass App component as an argument.');
 
-  const { map, infoWindow } = app.state;
+  const { map, infoWindow, locationsData } = app.state;
   // Set state with the new marker.
   app.setState(state => ({
     markers: state.markers.map(m => {
@@ -104,7 +141,13 @@ export const handleMarkerOnClick = (app, event, marker) => {
   map.setZoom(15);
 
   infoWindow.marker = marker;
-  infoWindowContent(app, marker);
+  let locationInfo = locationsData.filter( location => location.id === marker.id)[0]; // Get the location info based on the marker id.
+  if (locationInfo) {
+  	infoWindowContent(app, locationInfo);
+  } else {
+  	infoWindowContentError(app, marker);
+  	app.handleError(marker, 'No information is availabe for this location.');
+  }
   infoWindow.open(map, marker);
 
   // Store the button that opened the infoWindow to set focus on close.
@@ -113,12 +156,11 @@ export const handleMarkerOnClick = (app, event, marker) => {
   app.setState({ map, infoWindow });
 };
 
-const infoWindowContent = (app, marker) => {
+const infoWindowContent = (app, locationInfo) => {
 	if (!app.state.gMapsHandler) return console.log('GoogleMapsHelper.js - infoWindowContent: wrong argument passed. Please pass App component as an argument.');
 
-	const { infoWindow, locationsData } = app.state;
+	const { infoWindow } = app.state;
 
-  let locationInfo = locationsData.filter( location => location.id === marker.id)[0]; // Get the location info based on the marker id.
 	const { name, location, bestPhoto, canonicalUrl, categories } = locationInfo;
 
 	infoWindow.setContent(`
@@ -134,6 +176,19 @@ const infoWindowContent = (app, marker) => {
 				</div>`
 			) : ''}
 			<a tabindex="-1" class="infoWindow_link" href="${canonicalUrl}" target="_blank">Visit Forsquare site</a>
+		</div>
+	`);
+};
+
+const infoWindowContentError = (app, marker) => {
+	if (!app.state.gMapsHandler) return console.log('GoogleMapsHelper.js - infoWindowContentError: wrong argument passed. Please pass App component as an argument.');
+
+	const { infoWindow } = app.state;
+
+	infoWindow.setContent(`
+		<div class="infoWindow">
+			<h3 tabindex="-1" class="infoWindow_header">${marker.title}</h3>
+			<div tabindex="-1" class="infoWindow_error">There are no information for this location at the moment.</div>
 		</div>
 	`);
 };

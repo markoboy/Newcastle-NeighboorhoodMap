@@ -53,7 +53,7 @@ export const getLocations = () => {
 				} else if (response.ok) {
 					// Else if the response was ok, return the 3 first venues.
 					return response.json()
-						.then(data => data.response.venues.slice(0, 3));
+						.then(data => data.response.venues.slice(0, 4));
 				}
 			})
 			.catch(error => [ { errorType: error, errorDetail: 'Locations could not be loaded correctly. Please check your connection.' }])
@@ -77,25 +77,46 @@ export const getLocationsData = (venues) => {
 	}
 
 	return Promise.all( venues.map( venue =>
-		fetch(`https://api.foursquare.com/v2/venues/${venue.id}?&oauth_token=F5AWWCDVW2PY30QQ5LXNZGRN343VY525TNEGMUWEHSSC20PA&v=20180804`)
+		fetch(`https://api.foursquare.com/v2/venues/${venue.id}?&client_id=${auth.clientId}&client_secret=${auth.clientSecret}&v=20180323`)
 			.then(response => {
 				if (!response.ok) {
 					return response.json()
 						.then(error => [ { errorType: error.meta.errorType, errorDetail: error.meta.errorDetail } ]);
 				} else if (response.ok) {
 					return response.json()
-						.then(data => data.response.venue)
+						.then(data => data.response.venue);
 				}
 			})
 			.catch(error => [{ errorType: error, errorDetail: 'There was an error getting the Locations Data.' }])
 		)).then(venuesData => {
 			let merged = [].concat.apply([], venuesData);
 
-			// Save to localStorage.
-			let checkMerged = merged.filter(venue => venue.location);
-			if (checkMerged.length === merged.length && merged.length > 0)
-				window.localStorage.setItem('newcastleData', JSON.stringify(merged));
+			// Save only locations data to localStorage.
+			let locationsData = merged.filter(venue => venue.location);
+				window.localStorage.setItem('newcastleData', JSON.stringify(locationsData));
 
 			return merged;
 	});
+};
+
+/* Get location data by id. In case that getLocationsData failed to fetch some of the data. */
+export const getLocationInfo = (venueId) => {
+	return fetch(`https://api.foursquare.com/v2/venues/${venueId}?&client_id=${auth.clientId}&client_secret=${auth.clientSecret}&v=20180323`)
+		.then(response => {
+			if ( !response.ok ) {
+				return response.json()
+					.then(error => ({ errorType: error, errorDetail: 'No information is available for this location.' }));
+			} else if ( response.ok ) {
+				return response.json()
+					.then(data=> {
+						// Get the stored data and push the fetched data in it.
+						if (window.localStorage.newcastleData) {
+							let newcastleData = JSON.parse(window.localStorage.getItem('newcastleData'));
+							newcastleData.push(data.response.venue);
+							window.localStorage.setItem('newcastleData', JSON.stringify(newcastleData));
+						}
+						return data.response.venue;
+					});
+			}
+		});
 };

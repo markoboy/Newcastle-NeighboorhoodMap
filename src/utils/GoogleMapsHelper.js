@@ -8,7 +8,7 @@ import * as Locations from './Locations';
 /* From: https://www.simoahava.com/gtm-tips/add-load-listener-script-elements/ */
 export const loadGoogleMaps = (app) => {
 	let el = document.createElement('script');
-	el.src = 'https://maps.googleapis.com/maps/api/js?v=3'; //key=AIzaSyAnxs1wPyU-Aq5dvX-i98Noi2twhFDJOrE&
+	el.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyAnxs1wPyU-Aq5dvX-i98Noi2twhFDJOrE&v=3';
 	el.async = true;
 
 	el.addEventListener('load', function() {
@@ -51,8 +51,6 @@ export const initMarkers = async (app) => {
   // Get the locations and the locationsData. Await for promise to end before proceeding with the function.
 	let locations = await Locations.getLocations();
 	let locationsData = await Locations.getLocationsData(locations);
-	// Alert the user if there was data that wasnt fetched.
-	locationsData.filter(loc => loc.errorType).map(error => app.handleError(error.errorType, error.errorDetail));
 
   // Store markers in an array.
   let markers = [];
@@ -141,14 +139,25 @@ export const handleMarkerOnClick = (app, event, marker) => {
   map.setZoom(15);
 
   infoWindow.marker = marker;
+
   let locationInfo = locationsData.filter( location => location.id === marker.id)[0]; // Get the location info based on the marker id.
-  if (locationInfo) {
+  if (locationInfo) { // If locationInfo is fetched display it.
   	infoWindowContent(app, locationInfo);
+	  infoWindow.open(map, marker);
   } else {
-  	infoWindowContentError(app, marker);
-  	app.handleError(marker, 'No information is availabe for this location.');
+		// Else try to fetch the locationInfo from the Forsquare API.
+	  Locations.getLocationInfo(marker.id).then(dataInfo => {
+			if (dataInfo.errorType) { // If Forsquare API returned an error, inform the user.
+				infoWindowContentError(app, marker);
+				app.handleError(dataInfo.errorType, dataInfo.errorDetail);
+			} else {
+				// Else set the infoWindow content with the locationInfo and push the data to the state locationsData.
+				infoWindowContent(app, dataInfo);
+				infoWindow.open(map, marker);
+				app.setState(state => ({ locationsData: state.locationsData.concat(dataInfo) }));
+			}
+		});
   }
-  infoWindow.open(map, marker);
 
   // Store the button that opened the infoWindow to set focus on close.
   event ? app.storeButtonClicked(event.target) : app.storeButtonClicked(null);
@@ -162,14 +171,15 @@ const infoWindowContent = (app, locationInfo) => {
 	const { infoWindow } = app.state;
 
 	const { name, location, bestPhoto, canonicalUrl, categories } = locationInfo;
-
 	infoWindow.setContent(`
 		<div class="infoWindow">
 			<h3 tabindex="-1" class="infoWindow_header">${name}</h3>
 			${location.formattedAddress ? (
 				`<div tabindex="-1" class="infoWindow_location" aria-label="Adress: ${location.formattedAddress.join(', ')}">${location.formattedAddress.join(', ')}</div>`
 			) : ''}
-			<div tabindex="-1" class="infoWindow_category" aria-label="Location type: ${categories[0].name}">${categories[0].name}</div>
+			${categories[0] ? (
+				`<div tabindex="-1" class="infoWindow_category" aria-label="Location type: ${categories[0].name}">${categories[0].name}</div>`
+			) : ''}
 			${bestPhoto ? (
 				`<div class="infoWindow_img_container">
 					<img class="infoWindow_img" src="${bestPhoto.prefix}${bestPhoto.width}x${bestPhoto.height}${bestPhoto.suffix}" alt="A picture of ${name}"/>

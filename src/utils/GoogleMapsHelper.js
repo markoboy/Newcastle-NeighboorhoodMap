@@ -17,6 +17,7 @@ export const loadGoogleMaps = (app) => {
 	});
 
 	el.addEventListener('error', function(e) {
+		app.setState({ map: 'Google maps failed to load. Please check your connection.' });
 		app.handleError(e.target.src, 'Google maps failed to load. Please check your connection.');
 		// Try getting locations even if google maps fails to load.
 		Locations.getLocations()

@@ -11,7 +11,7 @@ class App extends Component {
       gMapsHandler: true,
       zoom: 13,
       maptype: 'roadmap',
-      map: null,
+      map: 'Loading...',
       markers: [],
       markerIcons: { default: '', highlighted: '' },
       buttonClicked: null,
@@ -117,7 +117,7 @@ class App extends Component {
           />
           <section className="map_container" onClick={() => this.closeSidebar()}>
             <div id='map' className="map" role="application" aria-label="Google Maps" tabIndex="-1"></div>
-            {map ? '' : (<span>Google Maps failed to load. Please check your connection.</span>)}
+            {typeof map !== 'string' ? '' : (<span tabIndex="0">{map}</span>)}
           </section>
         </div>
         <ErrorDialog errorMsg={error[0]} clearError={this.clearError} />

@@ -48,14 +48,18 @@ class Sidebar extends Component {
 	// Update backgrounds images every 20s.
 	updateBackgroundImage = () => {
 		const { images, imageInd, reqCounter} = this.state;
-		let timer;
+		let timer,
+			sidebar = document.querySelector('.sidebar');
 
 		// Check if the images have received data from the Unsplash API.
 		if (images.length > 0) {
 			// Preload the image before setting it, in order to have smooth transition between the changes.
 			let preloadImage = new Image();
 			preloadImage.src = images[imageInd].urls.regular;
-			preloadImage.onload = () => this.setState({ imageUrl: preloadImage.src });
+			preloadImage.onload = () => {
+				sidebar.style.backgroundImage = `url(${preloadImage.src}`;
+				this.setState({ imageUrl: preloadImage.src });
+			};
 
 			timer = setTimeout(() => {
 				// Check if the index is smaller than the images array.
@@ -152,9 +156,7 @@ class Sidebar extends Component {
 			<aside
 				id="sidebar"
 				className={isOpened ? "sidebar open" : "sidebar"}
-				style={isOpened ?
-					(this.state.imageUrl ? {display: 'inherit', backgroundImage: `url(${this.state.imageUrl}`} : {display: 'inherit'})
-					: {display: ''}}
+				style={isOpened ? {display: 'inherit'} : {display: ''}}
 				aria-labelledby="menubutton"
 				onKeyDown={(e) => this.handleEscapeKey(e)}>
 				<div className="filter-bar">
@@ -193,6 +195,7 @@ class Sidebar extends Component {
 						handleClick={this.openInfoWindow}
 					/>
 				</div>
+				<div className="unsplash_API">Background images from <a href="https://unsplash.com/" target="_blank">Unsplash</a></div>
 			</aside>
 		);
 	}

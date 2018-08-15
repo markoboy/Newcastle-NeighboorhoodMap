@@ -8,7 +8,7 @@ import * as Locations from './Locations';
 /* From: https://www.simoahava.com/gtm-tips/add-load-listener-script-elements/ */
 export const loadGoogleMaps = (app) => {
 	let el = document.createElement('script');
-	el.src = 'https://maps.googleapis.com/api/js?key=AIzaSyAnxs1wPyU-Aq5dvX-i98Noi2twhFDJOrE&v=3';
+	el.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyAnxs1wPyU-Aq5dvX-i98Noi2twhFDJOrE&v=3';
 	el.async = true;
 
 	el.addEventListener('load', function() {
@@ -18,7 +18,11 @@ export const loadGoogleMaps = (app) => {
 
 	el.addEventListener('error', function(e) {
 		app.handleError(e.target.src, 'Google maps failed to load. Please check your connection.');
-		Locations.getLocations().then(locations => app.setState({ locations }));
+		// Try getting locations even if google maps fails to load.
+		Locations.getLocations()
+			.then(locations => Locations.getLocationsData(locations)
+				.then(locationsData => app.setState({ locations, locationsData }))
+			);
 	});
 
 	document.head.appendChild(el);

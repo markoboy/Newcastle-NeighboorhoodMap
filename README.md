@@ -12,7 +12,7 @@
 	- [Local Installation](#local-installation)
 - [Browsers tested](#browsers-tested)
 - [Tools used](#tools-used)
-	-[Resources used](#resources-used)
+	- [Resources used](#resources-used)
 - [Author](#author)
 - [Contribution](#contribution)
 - [License](#license)

@@ -46,7 +46,7 @@ In order to succeed on this project, I had to create a Progressive Web Applicati
 
 [(Back to top)](#table-of-contents)
 
-At the moment there is no Live Demo available.
+A live demo of the page can be seen on [this git page](https://markoboy.github.io/Newcastle-NeighboorhoodMap/).
 
 ## Local Installation
 

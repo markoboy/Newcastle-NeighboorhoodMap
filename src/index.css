@@ -267,6 +267,10 @@ body {
 }
 
 /* Locations list styles */
+.locations_container {
+	flex-grow: 1;
+}
+
 .locations_list {
 	text-align: center;
 	list-style: none;
@@ -274,7 +278,6 @@ body {
 	padding: 0.5em 0;
 	background: linear-gradient(45deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.3));
 
-	flex-grow: 1;
 	line-height: 1;
 }
 
@@ -295,6 +298,29 @@ body {
 	color: white;
 	transition: 0.2s ease-in-out;
 	cursor: pointer;
+}
+
+/* Credits styles */
+.credits {
+	background: linear-gradient(45deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.3));
+	color: #000;
+	line-height: 1;
+	font-size: 0.8em;
+	flex-shrink: 0;
+}
+
+.credits p {
+	margin: 0.5em 1em;
+}
+
+.credits a {
+	color: blue;
+	text-decoration: none;
+}
+
+.credits a:hover, .credits a:focus {
+	color: darkblue;
+	text-decoration: underline;
 }
 
 /* =====================================

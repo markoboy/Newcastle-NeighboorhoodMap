@@ -188,14 +188,17 @@ class Sidebar extends Component {
 						)}
 					</form>
 				</div>
-				<div role="region" aria-label="Search results">
+				<div className="locations_container" role="region" aria-label="Search results">
 					<LocationsList
 						locations={showingLocations}
 						updateIcon={this.updateMarker}
 						handleClick={this.openInfoWindow}
 					/>
 				</div>
-				<div className="unsplash_API">Background images from <a href="https://unsplash.com/" target="_blank">Unsplash</a></div>
+				<div className="credits" role="contentinfo">
+					<p>Locations and locations information from <a href="https://foursquare.com/" rel="noopener noreferrer" target="_blank">Foursquare</a></p>
+					<p>Background images from <a href="https://unsplash.com/" rel="noopener noreferrer" target="_blank">Unsplash</a></p>
+				</div>
 			</aside>
 		);
 	}

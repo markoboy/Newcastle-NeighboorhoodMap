@@ -21,9 +21,11 @@ export const loadGoogleMaps = (app) => {
 		app.handleError(e.target.src, 'Google maps failed to load. Please check your connection.');
 		// Try getting locations even if google maps fails to load.
 		Locations.getLocations()
-			.then(locations => Locations.getLocationsData(locations)
+			.then(locations => {
+				if (locations[0].errorType) return app.handleError(locations[0].errorType, locations[0].errorDetail);
+				Locations.getLocationsData(locations)
 				.then(locationsData => app.setState({ locations, locationsData }))
-			);
+			})
 	});
 
 	document.head.appendChild(el);
@@ -113,7 +115,7 @@ export const initMarkers = async (app) => {
 
 const createMarkerIcon = (markerColor) => {
   return new window.google.maps.MarkerImage(
-    'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|'+ markerColor +
+    'https://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|'+ markerColor +
     '|40|_|%E2%80%A2',
     new window.google.maps.Size(25, 40),
     new window.google.maps.Point(0, 0),

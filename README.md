@@ -88,6 +88,7 @@ At the moment there is no Live Demo available.
 	- [React](https://reactjs.org/)
 - **Dependencies**
 	- [Create-react-app](https://github.com/facebook/create-react-app)
+	- [gh-pages](https://github.com/gitname/react-gh-pages)
 - **API**
 	- [Google Maps Javascript API](https://developers.google.com/maps/documentation/javascript/tutorial)
 	- [Foursquare API](https://developer.foursquare.com)

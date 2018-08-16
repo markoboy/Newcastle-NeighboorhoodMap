@@ -60,6 +60,9 @@ class Sidebar extends Component {
 				sidebar.style.backgroundImage = `url(${preloadImage.src}`;
 				this.setState({ imageUrl: preloadImage.src });
 			};
+			preloadImage.onerror = () => {
+				if (timer) clearTimeout(timer);
+			};
 
 			timer = setTimeout(() => {
 				// Check if the index is smaller than the images array.
